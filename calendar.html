@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>農曆陽曆日曆</title>
+    <style>
+        .calendar {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: "Microsoft JhengHei", sans-serif;
+        }
+        .calendar-header {
+            text-align: center;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+        .calendar-cell {
+            border: 1px solid #ddd;
+            padding: 10px;
+            min-height: 100px;
+        }
+        .solar-date {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .lunar-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .almanac {
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        .suitable {
+            color: #28a745;
+        }
+        .unsuitable {
+            color: #dc3545;
+        }
+        .jianzhu {
+            color: #1e88e5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="calendar-header">
+            <h2></h2>
+            <button onclick="prevMonth()">上個月</button>
+            <button onclick="nextMonth()">下個月</button>
+        </div>
+        <div class="calendar-grid">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+        </div>
+        <div id="calendar-body" class="calendar-grid"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
+    <script src="calendar.js"></script>
+
+</body>
+</html> 
