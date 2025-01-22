@@ -7,6 +7,7 @@
 // @match        https://calendar411.com/hk/huangli/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM.xmlHttpRequest
+// @grant    GM_addStyle
 // @connect      go-calendar.com
 // @connect      www.go-calendar.com
 // @require      http://html2canvas.hertzen.com/dist/html2canvas.min.js
@@ -45,10 +46,29 @@
     },
   };
 
+  GM_addStyle(`
+.clHl_bg{width: 180px;padding:5px 4px 6px 4px;min-height:130px}
+.clHl_bggray{width:180px; padding:5px 4px 6px 4px; min-height:130px}
+.clHl_bgtoday{width:180px; padding:5px 4px 6px 4px; min-height:130px}
+.cl_hl{font-size:12px;line-height:13px;}
+.cl_hlgray{font-size: 11px;line-height: 13px;color:#ddd}
+.cl_top{ font-size:14px; float:left; line-height:16px; padding-top:6px;  vertical-align:baseline;}
+.cl_topred{ font-size:14px; float:left; line-height:16px; padding-top:6px; vertical-align:baseline;}
+.cl_topgreen{ font-size:14px; float:left;  line-height:16px;padding-top:6px; vertical-align:bottom;}
+.cl_topgray{ font-size:14px; float:left; color:#ccc; line-height:16px;padding-top:6px;}
+.cl_Hlnum{ font-size:40px; font-family:Arial; font-weight:bold; text-align:center; line-height:36px;}
+.cl_Hlnumred{ font-size:40px; font-family:Arial; font-weight:bold; color:Red;text-align:center;line-height:36px;}
+.cl_Hlnumgreen{ font-size:40px; font-family:Arial; font-weight:bold; color:Green;text-align:center;line-height:36px;} 
+.cl_Hlnumgray{ font-size:40px; font-family:Arial; font-weight:bold; color:#ddd; text-align:center;line-height:36px;}
+.cl2_Title{width: 1304px;background-color:#dee3ef;text-align:center;font-weight:bold;font-size:24px;padding:8px;border-top: 2px solid #004973;border-left:2px solid #004973;border-right:2px solid #004973;}
+.mt_4 {MARGIN-TOP: 5px;}
+.cc_bgtoday{}
+`);
+
   // DOM 元素選擇器
   const SELECTORS = {
     TITLE: "ctl00_cphContent_ltH2",
-    CALENDAR: "ctl00_cphContent_dlLR",
+    CALENDAR: "ctl00_cphContent_dlLR_ctl00_divPr",
   };
 
   class FloatingButton {
@@ -178,13 +198,13 @@
           cells[i].querySelector("div").id.replace("dt", "")
         );
 
-        if (dateText) {
+        /*  if (dateText) {
           console.log(`找到日期: ${dateText}`);
           setTimeout(() => {
             this.enhanceCell(cells[i], dateText);
           }, delay);
           delay += 300; // 增加延遲時間，避免請求過於頻繁
-        }
+        }*/
       }
     }
 
