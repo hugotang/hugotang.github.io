@@ -57,13 +57,54 @@
 .cl_topred{ font-size:14px; float:left; line-height:16px; padding-top:6px; vertical-align:baseline;}
 .cl_topgreen{ font-size:14px; float:left;  line-height:16px;padding-top:6px; vertical-align:bottom;}
 .cl_topgray{ font-size:14px; float:left; color:#ccc; line-height:16px;padding-top:6px;}
-.cl_Hlnum{ font-size:40px; font-family:Arial; font-weight:bold; text-align:center; line-height:38px;}
-.cl_Hlnumred{ font-size:40px; font-family:Arial; font-weight:bold; color:Red;text-align:center;line-height:36px;}
-.cl_Hlnumgreen{ font-size:40px; font-family:Arial; font-weight:bold; color:Green;text-align:center;line-height:36px;}
-.cl_Hlnumgray{ font-size:40px; font-family:Arial; font-weight:bold; color:#ddd; text-align:center;line-height:36px;}
+.cl_Hlnum{ 
+    font-size:40px; 
+    font-family:Arial; 
+    font-weight:bold; 
+    text-align:center; 
+    line-height:38px;
+    position: relative;  
+    left: -8px;         
+}
+.cl_Hlnumred{ 
+    font-size:40px; 
+    font-family:Arial; 
+    font-weight:bold; 
+    color:Red;
+    text-align:center;
+    line-height:36px;
+    position: relative;  
+    left: -8px;         
+}
+.cl_Hlnumgreen{ 
+    font-size:40px; 
+    font-family:Arial; 
+    font-weight:bold; 
+    color:Green;
+    text-align:center;
+    line-height:36px;
+    position: relative;  
+    left: -8px;         
+}
+.cl_Hlnumgray{ 
+    font-size:40px; 
+    font-family:Arial; 
+    font-weight:bold; 
+    color:#ddd; 
+    text-align:center;
+    line-height:36px;
+    position: relative;  
+    left: -8px;         
+}
 .cl2_Title{width: 1304px;background-color:#dee3ef;text-align:center;font-weight:bold;font-size:24px;padding:8px;border-top: 2px solid #004973;border-left:2px solid #004973;border-right:2px solid #004973;}
 .mt_4 {MARGIN-TOP: 5px;}
 .cc_bgtoday{background-color:#fff;}
+.cl_st, .cl_main{ font-size:13px;text-align:center;line-height:14px;color:Green; }
+.cl_maingray{ font-size:13px;text-align:center;line-height:14px;color:#ccc; }
+.cl_mainred{ font-size:13px;text-align:center;line-height:14px;color:Red; }
+.cl_maintoday{ font-size:13px;text-align:center;line-height:14px;color:Green; }
+.cl_maingreen{ font-size:13px;text-align:center;line-height:14px;color:Green; }
+.cl_stp{ font-size:13px;text-align:left;line-height:14px;}
 `);
 
   // DOM 元素選擇器
