@@ -62,7 +62,7 @@
 .cl_Hlnumgray{ font-size:40px; font-family:Arial; font-weight:bold; color:#ddd; text-align:center;line-height:36px;}
 .cl2_Title{width: 1304px;background-color:#dee3ef;text-align:center;font-weight:bold;font-size:24px;padding:8px;border-top: 2px solid #004973;border-left:2px solid #004973;border-right:2px solid #004973;}
 .mt_4 {MARGIN-TOP: 5px;}
-.cc_bgtoday{}
+.cc_bgtoday{background-color:#fff;}
 `);
 
   // DOM 元素選擇器
