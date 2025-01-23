@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4a90e2">
+    <title>農曆陽曆日曆</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            font-family: "Microsoft JhengHei", sans-serif;
+        }
+
+        .calendar {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            text-align: center;
+            padding: 25px;
+            background: #4a90e2;
+            color: white;
+        }
+
+        .calendar-header h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.8em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .calendar-header button {
+            background: white;
+            border: none;
+            padding: 8px 20px;
+            margin: 0 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #4a90e2;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-header button:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #eee;
+            padding: 1px;
+        }
+
+        .weekday {
+            background: #f8f9fa;
+            padding: 15px 5px;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .calendar-cell {
+            background: white;
+            padding: 10px;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-cell:hover {
+            opacity: 1;
+            background: #f8f9fa !important;
+        }
+
+        .solar-date {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .solar-term {
+            font-size: 0.7em;
+            color: #e67e22;
+            font-weight: normal;
+        }
+
+        /* 當有節氣時的特殊樣式 */
+        .has-term .solar-date {
+            color: #e67e22;
+        }
+
+        .lunar-date {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .jianzhu {
+            color: #4a90e2;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .suitable {
+            color: #28a745;
+            margin-bottom: 3px;
+        }
+
+        .unsuitable {
+            color: #dc3545;
+        }
+
+        /* 週末特殊樣式 */
+        .calendar-grid .calendar-cell:nth-child(7n),
+        .calendar-grid .calendar-cell:nth-child(7n-6) {
+            background: white;
+        }
+
+        .calendar-grid .weekday:nth-child(7n),
+        .calendar-grid .weekday:nth-child(7n-6) {
+            color: #ff4d4f;
+        }
+
+        /* 週末日期紅色 */
+        .calendar-cell:nth-child(7n) .solar-date,
+        .calendar-cell:nth-child(7n-6) .solar-date {
+            color: #ff4d4f;
+        }
+
+        /* 週末但是非當前月份的日期顏色 */
+        .calendar-cell.prev-month,
+        .calendar-cell.next-month {
+            opacity: 0.7;
+            background: #f0f0f0 !important;
+        }
+
+        .calendar-cell.prev-month .solar-date,
+        .calendar-cell.next-month .solar-date {
+            color: #999;
+        }
+
+        .calendar-cell.prev-month .lunar-date,
+        .calendar-cell.next-month .lunar-date {
+            color: #aaa;
+        }
+
+        .calendar-cell.prev-month .jianzhu,
+        .calendar-cell.next-month .jianzhu {
+            color: #89b9e9;
+        }
+
+        .calendar-cell.prev-month .almanac,
+        .calendar-cell.next-month .almanac {
+            opacity: 0.7;
+        }
+
+        .calendar-cell.prev-month:hover,
+        .calendar-cell.next-month:hover {
+            opacity: 0.8;
+            background: #f0f0f0;
+        }
+
+        /* 懸停效果 */
+        .calendar-cell:hover {
+            opacity: 1;
+            background: #f8f9fa !important;
+        }
+
+        .calendar-cell:nth-child(7n):hover,
+        .calendar-cell:nth-child(7n-6):hover {
+            background: #f8f9fa !important;
+        }
+
+        /* 週末日期顏色 */
+        .calendar-cell:nth-child(7n) .solar-date,
+        .calendar-cell:nth-child(7n-6) .solar-date {
+            color: #ff4d4f;
+        }
+
+        /* 非當前月份的週末日期顏色 */
+        .calendar-cell.prev-month:nth-child(7n) .solar-date,
+        .calendar-cell.prev-month:nth-child(7n-6) .solar-date,
+        .calendar-cell.next-month:nth-child(7n) .solar-date,
+        .calendar-cell.next-month:nth-child(7n-6) .solar-date {
+            color: #ff7875;
+        }
+
+        /* 桌面版網格佈局 */
+        @media (min-width: 769px) {
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 1px;
+                background: #eee;
+                padding: 1px;
+            }
+        }
+
+        /* 手機版一行一格佈局 */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                height: 100vh;  /* 設置視窗高度 */
+                overflow: hidden;  /* 防止整個頁面滾動 */
+            }
+
+            .calendar {
+                height: 100vh;
+                height: -webkit-fill-available; /* 適配 iOS */
+                display: flex;
+                flex-direction: column;
+                margin: 0;
+                border-radius: 0;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                padding-top: env(safe-area-inset-top, 0);
+                padding-bottom: env(safe-area-inset-bottom, 0); /* 添加底部安全區域 */
+            }
+
+            .calendar-header {
+                position: relative;
+                background: #4a90e2;
+                padding: 10px 10px;  /* 減少上下內邊距 */
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                flex-shrink: 0;
+            }
+
+            #calendar-body.calendar-grid {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px)); /* 調整底部內邊距 */
+                position: relative;
+                overscroll-behavior: none;
+                -webkit-overscroll-behavior: none;
+            }
+
+            /* 重設網格為列表佈局 */
+            .calendar-grid,
+            #calendar-body.calendar-grid {
+                display: block !important;
+                background: white;
+                padding: 0;
+                gap: 0;
+                grid-template-columns: none !important;
+            }
+
+            /* 隱藏星期標題列 */
+            .calendar-grid > .weekday {
+                display: none !important;
+            }
+
+            /* 日期格子樣式 */
+            .calendar-cell {
+                display: flex !important;
+                flex-direction: row !important;
+                width: 100% !important;
+                box-sizing: border-box;
+                padding: 12px 15px;
+                border-bottom: 1px solid #eee;
+                margin: 0;
+                background: white;
+            }
+
+            /* 左側日期區域 */
+            .date-section {
+                width: 80px;
+                flex-shrink: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .solar-date {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 0;
+            }
+
+            .weekday-label {
+                font-size: 14px;
+                color: #666;
+            }
+
+            /* 右側內容區域 */
+            .content-section {
+                flex: 1;
+                padding-left: 15px;
+                border-left: 1px solid #eee;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            /* 內容樣式 */
+            .lunar-date {
+                font-size: 16px;
+                color: #666;
+            }
+
+            .jianzhu {
+                font-size: 16px;
+                color: #4a90e2;
+            }
+
+            .almanac {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .suitable {
+                color: #28a745;
+                margin-bottom: 4px;
+            }
+
+            .unsuitable {
+                color: #dc3545;
+            }
+
+            /* 非當前月份 */
+            .calendar-cell.prev-month,
+            .calendar-cell.next-month {
+                display: none !important;
+            }
+
+            /* 移除懸停效果 */
+            .calendar-cell:hover {
+                background: inherit !important;
+            }
+
+            /* 今天日期的高亮樣式 */
+            .calendar-cell.today {
+                background: #e6f7ff !important;
+                border-left: 3px solid #1890ff;
+            }
+
+            /* 重置所有日期顏色為默認色 */
+            .calendar-cell .solar-date {
+                color: #333 !important;
+            }
+
+            /* 手機版週末日期顏色 - 使用更具體的選擇器 */
+            .calendar-cell[data-weekday="0"] .solar-date,
+            .calendar-cell[data-weekday="6"] .solar-date {
+                color: #ff4d4f !important;
+            }
+
+            /* 手機版週末星期標籤顏色 */
+            .calendar-cell[data-weekday="0"] .weekday-label,
+            .calendar-cell[data-weekday="6"] .weekday-label {
+                color: #ff7875;
+            }
+
+            /* 移除其他可能影響顏色的樣式 */
+            .calendar-cell:nth-child(7n) .solar-date,
+            .calendar-cell:nth-child(7n-6) .solar-date {
+                color: inherit;
+            }
+
+            /* 調整固定按鈕的層級 */
+            .today-btn {
+                position: fixed;
+                bottom: max(20px, env(safe-area-inset-bottom, 20px)); /* 使用較大值 */
+                right: 20px;
+                z-index: 100;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                border-radius: 50% !important;
+                width: 50px;
+                height: 50px;
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* 防止 iOS 的彈性滾動 */
+            .calendar * {
+                -webkit-overflow-scrolling: auto;
+            }
+        }
+
+        /* 橫向模式優化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .calendar-grid {
+                gap: 0;
+            }
+
+            .calendar-cell {
+                padding: 5px;
+                min-height: 85px;
+            }
+
+            .calendar-controls {
+                flex-wrap: nowrap;
+            }
+
+            .almanac {
+                display: block;  /* 確保在橫向模式時顯示宜忌 */
+            }
+        }
+
+        /* 平板優化 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .calendar {
+                max-width: 95%;
+            }
+
+            .calendar-cell {
+                min-height: 100px;
+            }
+        }
+
+        .calendar-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .calendar-header button.screenshot {
+            background: #28a745;
+            color: white;
+        }
+
+        .calendar-header button.screenshot:hover {
+            background: #218838;
+        }
+
+        .calendar-header button.today-btn {
+            background: #1890ff;
+            color: white;
+        }
+
+        .calendar-header button.today-btn:hover {
+            background: #096dd9;
+        }
+
+        /* 截圖時的提示 */
+        .screenshot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5em;
+            z-index: 1000;
+        }
+
+        /* 今天日期的高亮樣式 - 桌面版 */
+        @media (min-width: 769px) {
+            .calendar-cell.today {
+                background: #e6f7ff !important;
+                border: 2px solid #1890ff;
+                position: relative;
+            }
+
+            .calendar-cell.today::before {
+                content: '今天';
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                background: #1890ff;
+                color: white;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-size: 12px;
+            }
+        }
+
+        /* 今天日期的高亮樣式 - 手機版 */
+        @media (max-width: 768px) {
+            .calendar-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .date-selectors {
+                order: -1;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .year-select,
+            .month-select {
+                padding: 6px 25px 6px 10px;
+                font-size: 0.85em;
+            }
+        }
+
+        .date-selectors {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .year-select,
+        .month-select {
+            padding: 8px;
+            border-radius: 20px;
+            border: none;
+            font-size: 0.9em;
+            cursor: pointer;
+            background: white;
+            color: #4a90e2;
+            min-width: 80px;
+            text-align: center;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a90e2' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+
+        .year-select:hover,
+        .month-select:hover {
+            background-color: #f0f0f0;
+        }
+
+        .lunar-year {
+            font-size: 0.75em;   /* 調整農曆年份大小 */
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 10px;   /* 減少內邊距 */
+            border-radius: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-header h2 {
+                flex-direction: column;
+                gap: 8px;
+                margin: 0 0 10px 0;  /* 減少下邊距 */
+                font-size: 1.6em;    /* 稍微縮小字體 */
+            }
+        }
+
+        /* 修改手機版導航按鈕樣式 */
+        @media (max-width: 768px) {
+            .prev-month:not(.mobile-nav),
+            .next-month:not(.mobile-nav) {
+                display: none;  /* 隱藏原本的上下月按鈕 */
+            }
+
+            .mobile-nav {
+                background: transparent !important;
+                color: white !important;
+                padding: 8px !important;
+                margin: 0 !important;
+                font-size: 1.2em;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-nav:hover {
+                background: rgba(255, 255, 255, 0.1) !important;
+                transform: none !important;
+            }
+
+            .date-selectors {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .year-select,
+            .month-select {
+                min-width: 100px;
+            }
+        }
+
+        /* 桌面版隱藏手機版導航按鈕 */
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+        }
+
+        /* 假期樣式 */
+        .calendar-cell.holiday {
+            background: #fff1f0 !important;  /* 添加 !important */
+        }
+
+        @media (max-width: 768px) {
+            /* 手機版假期樣式 */
+            .calendar-cell.holiday {
+                background: #fff1f0 !important;
+                border-left: 3px solid #ff4d4f !important;  /* 添加紅色邊框 */
+            }
+
+            /* 確保假期背景色優先級高於其他樣式 */
+            .calendar-cell.holiday.today {
+                background: #fff1f0 !important;
+                border-left: 3px solid #ff4d4f !important;
+            }
+
+            /* 調整假期標籤樣式 */
+            .holiday-label {
+                font-size: 14px;
+                color: #ff4d4f;
+                font-weight: bold;
+            }
+        }
+
+        /* 桌面版假期樣式 */
+        @media (min-width: 769px) {
+            .calendar-cell.holiday {
+                background: #fff1f0 !important;
+                position: relative;
+            }
+
+            .calendar-cell.holiday.today {
+                background: #fff1f0 !important;
+                border: 2px solid #ff4d4f;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="calendar-header">
+            <h2>
+                <span class="solar-year"></span>
+                <span class="lunar-year"></span>
+            </h2>
+            <div class="calendar-controls">
+                <div class="date-selectors">
+                    <button class="prev-month mobile-nav">◀</button>
+                    <select class="year-select"></select>
+                    <select class="month-select"></select>
+                    <button class="next-month mobile-nav">▶</button>
+                </div>
+                <button class="today-btn">今日</button>
+                <!--<button class="screenshot">📸 截圖</button>-->
+            </div>
+        </div>
+        <div class="calendar-grid">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+        </div>
+        <div id="calendar-body" class="calendar-grid"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="calendar.js"></script>
+</body>
+</html> 
