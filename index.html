@@ -1252,6 +1252,46 @@
             margin-right: 0;  /* 移除原有的右側間距 */
             padding-right: 0;
         }
+
+        /* 節氣樣式優化 */
+        .has-term .solar-term {
+            color: var(--solar-term-color);
+            font-size: 0.8em;
+            /* 添加半透明背景 */
+            background: rgba(230, 126, 34, 0.12);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            /* 添加內邊距和圓角 */
+            padding: 1px 6px;
+            border-radius: 8px;
+            /* 確保文字居中 */
+            display: inline-block;
+            line-height: 1.4;
+            /* 添加微妙的陰影 */
+            box-shadow: 0 1px 2px rgba(230, 126, 34, 0.1);
+        }
+
+        /* 深色主題下的節氣樣式調整 */
+        [data-theme="dark"] .has-term .solar-term {
+            background: rgba(230, 126, 34, 0.15);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 確保節氣顯示在正確的位置 */
+        .calendar-cell .solar-term {
+            margin-top: 2px;
+            /* 防止長節氣名稱換行 */
+            white-space: nowrap;
+            /* 優化過渡效果 */
+            transition: all 0.2s ease;
+        }
+
+        /* 懸停效果 */
+        .has-term:hover .solar-term {
+            background: rgba(230, 126, 34, 0.18);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(230, 126, 34, 0.15);
+        }
     </style>
 </head>
 <body>
