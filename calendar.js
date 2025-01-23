@@ -16,6 +16,11 @@ class LunarCalendar {
         this.currentDate.getMonth()
       );
     });
+
+    // 添加手勢支持
+    if (window.innerWidth <= 768) {
+      this.initTouchGestures();
+    }
   }
 
   // 將 i18n 初始化移到單獨的方法
@@ -1227,6 +1232,84 @@ class LunarCalendar {
     });
 
     return this.holidays[dateStr] || this.holidays[monthDayStr];
+  }
+
+  initTouchGestures() {
+    const calendarBody = document.getElementById('calendar-body');
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    calendarBody.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    
+    calendarBody.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].clientX;
+      const diffX = touchEndX - touchStartX;
+      
+      // 如果滑動距離超過50px，則切換月份
+      if (Math.abs(diffX) > 50) {
+        if (diffX > 0) {
+          // 向右滑動，上個月
+          const date = this.currentDate;
+          date.setMonth(date.getMonth() - 1);
+          this.renderCalendar(date.getFullYear(), date.getMonth());
+        } else {
+          // 向左滑動，下個月
+          const date = this.currentDate;
+          date.setMonth(date.getMonth() + 1);
+          this.renderCalendar(date.getFullYear(), date.getMonth());
+        }
+      }
+    }, { passive: true });
+  }
+
+  initPullToRefresh() {
+    const calendarBody = document.getElementById('calendar-body');
+    let touchStartY = 0;
+    let pullStarted = false;
+    
+    // 創建刷新提示元素
+    const refreshHint = document.createElement('div');
+    refreshHint.className = 'refresh-hint';
+    refreshHint.textContent = '下拉刷新';
+    document.querySelector('.calendar').insertBefore(refreshHint, calendarBody);
+    
+    calendarBody.addEventListener('touchstart', (e) => {
+      if (calendarBody.scrollTop === 0) {
+        touchStartY = e.touches[0].clientY;
+        pullStarted = true;
+      }
+    }, { passive: true });
+    
+    calendarBody.addEventListener('touchmove', (e) => {
+      if (!pullStarted) return;
+      
+      const pullDistance = e.touches[0].clientY - touchStartY;
+      if (pullDistance > 0) {
+        refreshHint.style.transform = `translateY(${Math.min(pullDistance/2, 60)}px)`;
+        if (pullDistance > 100) {
+          refreshHint.textContent = '釋放刷新';
+        }
+      }
+    }, { passive: true });
+    
+    calendarBody.addEventListener('touchend', async () => {
+      if (!pullStarted) return;
+      pullStarted = false;
+      
+      const pullDistance = parseInt(refreshHint.style.transform.replace('translateY(', ''));
+      if (pullDistance > 50) {
+        refreshHint.textContent = '正在刷新...';
+        // 重新渲染日曆
+        await this.refreshCalendar();
+      }
+      
+      refreshHint.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        refreshHint.textContent = '下拉刷新';
+      }, 300);
+    }, { passive: true });
   }
 }
 
