@@ -2,14 +2,161 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#4a90e2">
     <title>農曆陽曆日曆</title>
     <style>
+        /* 默認（淺色）主題變量 */
+        :root {
+            /* 基礎顏色 */
+            --bg-color: #f5f5f5;
+            --calendar-bg: white;
+            --header-bg: #4a90e2;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #eee;
+            
+            /* 互動元素 */
+            --hover-bg: #f8f9fa;
+            --button-bg: white;
+            --button-text: #4a90e2;
+            --button-hover: #f0f0f0;
+            
+            /* 特殊日期 */
+            --holiday-bg: #fff1f0;
+            --holiday-text: #ff4d4f;
+            --today-bg: #e6f7ff;
+            --today-border: #1890ff;
+            --weekend-color: #ff4d4f;
+            
+            /* 日曆內容 */
+            --solar-term-color: #e67e22;
+            --suitable-color: #28a745;
+            --unsuitable-color: #dc3545;
+            --jianzhu-color: #4a90e2;
+            
+            /* 其他元素 */
+            --grid-bg: #eee;
+            --dropdown-bg: white;
+            --dropdown-border: #eee;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            
+            /* 非當前月份 */
+            --prev-next-month-bg: #f0f0f0;
+            --prev-next-month-text: #999;
+            --prev-next-month-lunar: #aaa;
+            --prev-next-month-jianzhu: #89b9e9;
+        }
+
+        /* 深色模式樣式 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* 基礎顏色 */
+                --bg-color: #121212;
+                --calendar-bg: #1f1f1f;
+                --header-bg: #1a4977;
+                --text-color: #e0e0e0;
+                --text-secondary: #a0a0a0;
+                --border-color: #333;
+                
+                /* 互動元素 */
+                --hover-bg: #2d2d2d;
+                --button-bg: #2d2d2d;
+                --button-text: #e0e0e0;
+                --button-hover: #3d3d3d;
+                
+                /* 特殊日期 */
+                --holiday-bg: #321d1d;
+                --holiday-text: #ff7875;
+                --today-bg: #1a3f5c;
+                --today-border: #177ddc;
+                --weekend-color: #ff7875;
+                
+                /* 日曆內容 */
+                --solar-term-color: #ffa940;
+                --suitable-color: #52c41a;
+                --unsuitable-color: #ff4d4f;
+                --jianzhu-color: #177ddc;
+                
+                /* 其他元素 */
+                --grid-bg: #2d2d2d;
+                --dropdown-bg: #2d2d2d;
+                --dropdown-border: #404040;
+                --shadow-color: rgba(0, 0, 0, 0.3);
+                
+                /* 非當前月份 */
+                --prev-next-month-bg: #262626;
+                --prev-next-month-text: #666;
+                --prev-next-month-lunar: #555;
+                --prev-next-month-jianzhu: #405d80;
+            }
+
+            /* 深色模式特定調整 */
+            .calendar {
+                box-shadow: 0 2px 15px var(--shadow-color);
+            }
+
+            .year-select,
+            .month-select {
+                border: 1px solid var(--dropdown-border);
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e0e0e0' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            }
+
+            .calendar-cell {
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .content-section {
+                border-left: 1px solid var(--border-color);
+            }
+
+            .jianzhu {
+                color: var(--jianzhu-color);
+            }
+
+            .holiday-label {
+                color: var(--holiday-text);
+            }
+
+            /* 手機版導航按鈕 */
+            .mobile-nav {
+                color: var(--text-color) !important;
+            }
+
+            /* 今天按鈕 */
+            .today-btn {
+                background: var(--header-bg) !important;
+                color: var(--text-color) !important;
+            }
+
+            /* 深色模式下的狀態欄背景 */
+            .calendar-header {
+                background: var(--header-bg);
+            }
+
+            /* 深色模式下的星期標題 */
+            .weekday {
+                background: var(--calendar-bg);  /* 使用日曆背景色 */
+                border-bottom: 1px solid var(--border-color);  /* 添加底部邊框 */
+            }
+
+            /* 深色模式下的星期標籤顏色調整 - 桌面版和手機版通用 */
+            .weekday-label {
+                color: var(--text-color);
+                opacity: 0.9;
+            }
+
+            .calendar-cell[data-weekday="0"] .weekday-label,
+            .calendar-cell[data-weekday="6"] .weekday-label {
+                color: var(--weekend-color);
+                opacity: 1;
+            }
+        }
+
         body {
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
             font-family: "Microsoft JhengHei", sans-serif;
@@ -19,16 +166,16 @@
             width: 100%;
             max-width: 1500px;
             margin: 0 auto;
-            background: white;
+            background: var(--calendar-bg);
             border-radius: 15px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 15px var(--shadow-color);
             overflow: hidden;
         }
 
         .calendar-header {
             text-align: center;
             padding: 25px;
-            background: #4a90e2;
+            background: var(--header-bg);
             color: white;
         }
 
@@ -42,19 +189,19 @@
         }
 
         .calendar-header button {
-            background: white;
+            background: var(--button-bg);
             border: none;
             padding: 8px 20px;
             margin: 0 10px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.9em;
-            color: #4a90e2;
+            color: var(--button-text);
             transition: all 0.3s ease;
         }
 
         .calendar-header button:hover {
-            background: #f0f0f0;
+            background: var(--button-hover);
             transform: translateY(-2px);
         }
 
@@ -62,20 +209,20 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
-            background: #eee;
+            background: var(--grid-bg);
             padding: 1px;
         }
 
         .weekday {
-            background: #f8f9fa;
+            background: var(--hover-bg);
             padding: 15px 5px;
             text-align: center;
             font-weight: bold;
-            color: #666;
+            color: var(--text-color);
         }
 
         .calendar-cell {
-            background: white;
+            background: var(--calendar-bg);
             padding: 10px;
             min-height: 120px;
             transition: all 0.3s ease;
@@ -83,7 +230,7 @@
 
         .calendar-cell:hover {
             opacity: 1;
-            background: #f8f9fa !important;
+            background: var(--hover-bg) !important;
         }
 
         .solar-date {
@@ -92,80 +239,81 @@
             align-items: center;
             font-size: 1.4em;
             font-weight: bold;
-            color: #333;
+            color: var(--text-color);
             margin-bottom: 5px;
         }
 
         .solar-term {
             font-size: 0.7em;
-            color: #e67e22;
+            color: var(--solar-term-color);
             font-weight: normal;
         }
 
         /* 當有節氣時的特殊樣式 */
         .has-term .solar-date {
-            color: #e67e22;
+            color: var(--solar-term-color);
         }
 
         .lunar-date {
             font-size: 0.9em;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 5px;
         }
 
         .jianzhu {
-            color: #4a90e2;
+            color: var(--jianzhu-color);
             font-weight: bold;
             margin-bottom: 8px;
             font-size: 0.95em;
         }
 
         .suitable {
-            color: #28a745;
+            color: var(--suitable-color);
             margin-bottom: 3px;
         }
 
         .unsuitable {
-            color: #dc3545;
+            color: var(--unsuitable-color);
         }
 
         /* 週末特殊樣式 */
         .calendar-grid .calendar-cell:nth-child(7n),
         .calendar-grid .calendar-cell:nth-child(7n-6) {
-            background: white;
+            background: var(--calendar-bg);
         }
 
-        .calendar-grid .weekday:nth-child(7n),
-        .calendar-grid .weekday:nth-child(7n-6) {
-            color: #ff4d4f;
+        /* 週末星期標題顏色 */
+        .weekday:first-child,
+        .weekday:last-child {
+            color: var(--weekend-color);
         }
 
         /* 週末日期紅色 */
         .calendar-cell:nth-child(7n) .solar-date,
         .calendar-cell:nth-child(7n-6) .solar-date {
-            color: #ff4d4f;
+            color: var(--weekend-color);
         }
 
         /* 週末但是非當前月份的日期顏色 */
         .calendar-cell.prev-month,
         .calendar-cell.next-month {
             opacity: 0.7;
-            background: #f0f0f0 !important;
+            background: var(--prev-next-month-bg) !important;
         }
 
         .calendar-cell.prev-month .solar-date,
         .calendar-cell.next-month .solar-date {
-            color: #999;
+            color: var(--prev-next-month-text);
         }
 
         .calendar-cell.prev-month .lunar-date,
         .calendar-cell.next-month .lunar-date {
-            color: #aaa;
+            color: var(--prev-next-month-lunar);
         }
 
         .calendar-cell.prev-month .jianzhu,
         .calendar-cell.next-month .jianzhu {
-            color: #89b9e9;
+            color: var(--prev-next-month-jianzhu);
         }
 
         .calendar-cell.prev-month .almanac,
@@ -176,24 +324,18 @@
         .calendar-cell.prev-month:hover,
         .calendar-cell.next-month:hover {
             opacity: 0.8;
-            background: #f0f0f0;
+            background: var(--prev-next-month-bg);
         }
 
         /* 懸停效果 */
         .calendar-cell:hover {
             opacity: 1;
-            background: #f8f9fa !important;
+            background: var(--hover-bg) !important;
         }
 
         .calendar-cell:nth-child(7n):hover,
         .calendar-cell:nth-child(7n-6):hover {
-            background: #f8f9fa !important;
-        }
-
-        /* 週末日期顏色 */
-        .calendar-cell:nth-child(7n) .solar-date,
-        .calendar-cell:nth-child(7n-6) .solar-date {
-            color: #ff4d4f;
+            background: var(--hover-bg) !important;
         }
 
         /* 非當前月份的週末日期顏色 */
@@ -201,7 +343,7 @@
         .calendar-cell.prev-month:nth-child(7n-6) .solar-date,
         .calendar-cell.next-month:nth-child(7n) .solar-date,
         .calendar-cell.next-month:nth-child(7n-6) .solar-date {
-            color: #ff7875;
+            color: var(--weekend-color);
         }
 
         /* 桌面版網格佈局 */
@@ -210,7 +352,7 @@
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
                 gap: 1px;
-                background: #eee;
+                background: var(--grid-bg);
                 padding: 1px;
             }
         }
@@ -220,13 +362,14 @@
             body {
                 padding: 0;
                 margin: 0;
-                height: 100vh;  /* 設置視窗高度 */
-                overflow: hidden;  /* 防止整個頁面滾動 */
+                height: 100vh;
+                height: -webkit-fill-available;
+                overflow: hidden;
             }
 
             .calendar {
                 height: 100vh;
-                height: -webkit-fill-available; /* 適配 iOS */
+                height: -webkit-fill-available;
                 display: flex;
                 flex-direction: column;
                 margin: 0;
@@ -236,14 +379,17 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                padding-top: env(safe-area-inset-top, 0);
-                padding-bottom: env(safe-area-inset-bottom, 0); /* 添加底部安全區域 */
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
             }
 
             .calendar-header {
                 position: relative;
-                background: #4a90e2;
-                padding: 10px 10px;  /* 減少上下內邊距 */
+                background: var(--header-bg);
+                padding: 10px 10px;
+                padding-top: max(10px, env(safe-area-inset-top));
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                 flex-shrink: 0;
             }
@@ -252,7 +398,7 @@
                 flex: 1;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
-                padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px)); /* 調整底部內邊距 */
+                padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
                 position: relative;
                 overscroll-behavior: none;
                 -webkit-overscroll-behavior: none;
@@ -262,7 +408,7 @@
             .calendar-grid,
             #calendar-body.calendar-grid {
                 display: block !important;
-                background: white;
+                background: var(--calendar-bg);
                 padding: 0;
                 gap: 0;
                 grid-template-columns: none !important;
@@ -280,9 +426,9 @@
                 width: 100% !important;
                 box-sizing: border-box;
                 padding: 12px 15px;
-                border-bottom: 1px solid #eee;
+                border-bottom: 1px solid var(--border-color);
                 margin: 0;
-                background: white;
+                background: var(--calendar-bg);
             }
 
             /* 左側日期區域 */
@@ -302,14 +448,15 @@
 
             .weekday-label {
                 font-size: 14px;
-                color: #666;
+                color: var(--text-color);
+                opacity: 0.85;
             }
 
             /* 右側內容區域 */
             .content-section {
                 flex: 1;
                 padding-left: 15px;
-                border-left: 1px solid #eee;
+                border-left: 1px solid var(--border-color);
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
@@ -318,12 +465,12 @@
             /* 內容樣式 */
             .lunar-date {
                 font-size: 16px;
-                color: #666;
+                color: var(--text-secondary);
             }
 
             .jianzhu {
                 font-size: 16px;
-                color: #4a90e2;
+                color: var(--jianzhu-color);
             }
 
             .almanac {
@@ -332,12 +479,12 @@
             }
 
             .suitable {
-                color: #28a745;
+                color: var(--suitable-color);
                 margin-bottom: 4px;
             }
 
             .unsuitable {
-                color: #dc3545;
+                color: var(--unsuitable-color);
             }
 
             /* 非當前月份 */
@@ -353,25 +500,26 @@
 
             /* 今天日期的高亮樣式 */
             .calendar-cell.today {
-                background: #e6f7ff !important;
-                border-left: 3px solid #1890ff;
+                background: var(--today-bg) !important;
+                border-left: 3px solid var(--today-border);
             }
 
             /* 重置所有日期顏色為默認色 */
             .calendar-cell .solar-date {
-                color: #333 !important;
+                color: var(--text-color) !important;
             }
 
             /* 手機版週末日期顏色 - 使用更具體的選擇器 */
             .calendar-cell[data-weekday="0"] .solar-date,
             .calendar-cell[data-weekday="6"] .solar-date {
-                color: #ff4d4f !important;
+                color: var(--weekend-color) !important;
             }
 
             /* 手機版週末星期標籤顏色 */
             .calendar-cell[data-weekday="0"] .weekday-label,
             .calendar-cell[data-weekday="6"] .weekday-label {
-                color: #ff7875;
+                color: var(--weekend-color);
+                opacity: 0.9;
             }
 
             /* 移除其他可能影響顏色的樣式 */
@@ -383,8 +531,8 @@
             /* 調整固定按鈕的層級 */
             .today-btn {
                 position: fixed;
-                bottom: max(20px, env(safe-area-inset-bottom, 20px)); /* 使用較大值 */
-                right: 20px;
+                bottom: max(20px, env(safe-area-inset-bottom, 20px));
+                right: max(20px, env(safe-area-inset-right, 20px));
                 z-index: 100;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                 border-radius: 50% !important;
@@ -440,21 +588,21 @@
         }
 
         .calendar-header button.screenshot {
-            background: #28a745;
+            background: var(--suitable-color);
             color: white;
         }
 
         .calendar-header button.screenshot:hover {
-            background: #218838;
+            background: var(--suitable-color);
         }
 
         .calendar-header button.today-btn {
-            background: #1890ff;
+            background: var(--today-bg);
             color: white;
         }
 
         .calendar-header button.today-btn:hover {
-            background: #096dd9;
+            background: var(--today-bg);
         }
 
         /* 截圖時的提示 */
@@ -476,8 +624,8 @@
         /* 今天日期的高亮樣式 - 桌面版 */
         @media (min-width: 769px) {
             .calendar-cell.today {
-                background: #e6f7ff !important;
-                border: 2px solid #1890ff;
+                background: var(--today-bg) !important;
+                border: 2px solid var(--today-border);
                 position: relative;
             }
 
@@ -486,7 +634,7 @@
                 position: absolute;
                 top: 2px;
                 right: 2px;
-                background: #1890ff;
+                background: var(--today-bg);
                 color: white;
                 padding: 2px 6px;
                 border-radius: 3px;
@@ -529,8 +677,8 @@
             border: none;
             font-size: 0.9em;
             cursor: pointer;
-            background: white;
-            color: #4a90e2;
+            background: var(--dropdown-bg);
+            color: var(--button-text);
             min-width: 80px;
             text-align: center;
             appearance: none;
@@ -542,7 +690,7 @@
 
         .year-select:hover,
         .month-select:hover {
-            background-color: #f0f0f0;
+            background-color: var(--dropdown-bg);
         }
 
         .lunar-year {
@@ -611,26 +759,26 @@
 
         /* 假期樣式 */
         .calendar-cell.holiday {
-            background: #fff1f0 !important;  /* 添加 !important */
+            background: var(--holiday-bg) !important;  /* 添加 !important */
         }
 
         @media (max-width: 768px) {
             /* 手機版假期樣式 */
             .calendar-cell.holiday {
-                background: #fff1f0 !important;
-                border-left: 3px solid #ff4d4f !important;  /* 添加紅色邊框 */
+                background: var(--holiday-bg) !important;
+                border-left: 3px solid var(--holiday-text) !important;  /* 添加紅色邊框 */
             }
 
             /* 確保假期背景色優先級高於其他樣式 */
             .calendar-cell.holiday.today {
-                background: #fff1f0 !important;
-                border-left: 3px solid #ff4d4f !important;
+                background: var(--holiday-bg) !important;
+                border-left: 3px solid var(--holiday-text) !important;
             }
 
             /* 調整假期標籤樣式 */
             .holiday-label {
                 font-size: 14px;
-                color: #ff4d4f;
+                color: var(--holiday-text);
                 font-weight: bold;
             }
         }
@@ -638,14 +786,115 @@
         /* 桌面版假期樣式 */
         @media (min-width: 769px) {
             .calendar-cell.holiday {
-                background: #fff1f0 !important;
+                background: var(--holiday-bg) !important;
                 position: relative;
             }
 
             .calendar-cell.holiday.today {
-                background: #fff1f0 !important;
-                border: 2px solid #ff4d4f;
+                background: var(--holiday-bg) !important;
+                border: 2px solid var(--holiday-text);
             }
+        }
+
+        /* 強制深色模式 */
+        :root[data-theme="dark"] {
+            /* 基礎顏色 */
+            --bg-color: #121212;
+            --calendar-bg: #1f1f1f;
+            --header-bg: #1a4977;
+            --text-color: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #333;
+            
+            /* 互動元素 */
+            --hover-bg: #2d2d2d;
+            --button-bg: #2d2d2d;
+            --button-text: #e0e0e0;
+            --button-hover: #3d3d3d;
+            
+            /* 特殊日期 */
+            --holiday-bg: #321d1d;
+            --holiday-text: #ff7875;
+            --today-bg: #1a3f5c;
+            --today-border: #177ddc;
+            --weekend-color: #ff7875;
+            
+            /* 日曆內容 */
+            --solar-term-color: #ffa940;
+            --suitable-color: #52c41a;
+            --unsuitable-color: #ff4d4f;
+            --jianzhu-color: #177ddc;
+            
+            /* 其他元素 */
+            --grid-bg: #2d2d2d;
+            --dropdown-bg: #2d2d2d;
+            --dropdown-border: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            
+            /* 非當前月份 */
+            --prev-next-month-bg: #262626;
+            --prev-next-month-text: #666;
+            --prev-next-month-lunar: #555;
+            --prev-next-month-jianzhu: #405d80;
+        }
+
+        /* 強制淺色模式 */
+        :root[data-theme="light"] {
+            /* 基礎顏色 */
+            --bg-color: #f5f5f5;
+            --calendar-bg: white;
+            --header-bg: #4a90e2;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #eee;
+            
+            /* 互動元素 */
+            --hover-bg: #f8f9fa;
+            --button-bg: white;
+            --button-text: #4a90e2;
+            --button-hover: #f0f0f0;
+            
+            /* 特殊日期 */
+            --holiday-bg: #fff1f0;
+            --holiday-text: #ff4d4f;
+            --today-bg: #e6f7ff;
+            --today-border: #1890ff;
+            --weekend-color: #ff4d4f;
+            
+            /* 日曆內容 */
+            --solar-term-color: #e67e22;
+            --suitable-color: #28a745;
+            --unsuitable-color: #dc3545;
+            --jianzhu-color: #4a90e2;
+            
+            /* 其他元素 */
+            --grid-bg: #eee;
+            --dropdown-bg: white;
+            --dropdown-border: #eee;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            
+            /* 非當前月份 */
+            --prev-next-month-bg: #f0f0f0;
+            --prev-next-month-text: #999;
+            --prev-next-month-lunar: #aaa;
+            --prev-next-month-jianzhu: #89b9e9;
+        }
+        
+        .theme-toggle {
+            background: var(--button-bg);
+            border: none;
+            padding: 8px 20px;
+            margin: 0 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: var(--button-text);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -664,6 +913,7 @@
                     <button class="next-month mobile-nav">▶</button>
                 </div>
                 <button class="today-btn">今日</button>
+                <button class="theme-toggle">🌓</button>
                 <!--<button class="screenshot">📸 截圖</button>-->
             </div>
         </div>
@@ -682,5 +932,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="calendar.js"></script>
+    <script>
+        // 更新狀態欄顏色的函數
+        function updateStatusBarColor(isDark) {
+            // 更新 theme-color
+            const themeColor = isDark ? '#1a4977' : '#4a90e2';
+            document.querySelector('meta[name="theme-color"]').content = themeColor;
+            
+            // 強制觸發狀態欄更新
+            document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content = 'default';
+            setTimeout(() => {
+                document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content = 'black-translucent';
+            }, 20);
+        }
+        
+        // 主題切換功能
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            const root = document.documentElement;
+            const currentTheme = root.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                root.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                updateStatusBarColor(false);
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                updateStatusBarColor(true);
+            }
+        });
+        
+        // 初始化主題
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateStatusBarColor(savedTheme === 'dark');
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateStatusBarColor(true);
+        }
+    </script>
 </body>
 </html> 
