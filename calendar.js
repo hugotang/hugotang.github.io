@@ -21,6 +21,9 @@ class LunarCalendar {
     if (window.innerWidth <= 768) {
       this.initTouchGestures();
     }
+
+    // 添加滾動監聽
+    this.initScrollBehavior();
   }
 
   // 將 i18n 初始化移到單獨的方法
@@ -845,11 +848,15 @@ class LunarCalendar {
     const zodiac = lunarDate.getYearShengXiao();
 
     // 更新標題
-    const solarYearSpan = document.querySelector(".solar-year");
-    const lunarYearSpan = document.querySelector(".lunar-year");
+    document.querySelector('.lunar-year').textContent = `${ganZhi}年 [${zodiac}]`;
 
-    solarYearSpan.textContent = `${year}年${month + 1}月`;
-    lunarYearSpan.textContent = `${ganZhi}年 [${zodiac}]`;
+    // 更新選擇器
+    const yearSelect = document.querySelector('.year-select');
+    const monthSelect = document.querySelector('.month-select');
+    
+    // 更新年份選擇器的顯示文字
+    yearSelect.value = year;
+    monthSelect.value = month;
 
     const fragment = document.createDocumentFragment();
     const firstDay = new Date(year, month, 1);
@@ -904,10 +911,6 @@ class LunarCalendar {
     const calendarBody = document.getElementById("calendar-body");
     calendarBody.innerHTML = "";
     calendarBody.appendChild(fragment);
-
-    // 更新選擇器的值
-    document.querySelector(".year-select").value = year;
-    document.querySelector(".month-select").value = month;
   }
 
   createDateCell(day, lunar, monthType = "current-month") {
@@ -1086,20 +1089,20 @@ class LunarCalendar {
   }
 
   initYearSelect() {
-    const yearSelect = document.querySelector(".year-select");
+    const yearSelect = document.querySelector('.year-select');
     const currentYear = new Date().getFullYear();
-
-    // 生成前後 100 年的選項
-    for (let year = currentYear - 100; year <= currentYear + 100; year++) {
-      const option = document.createElement("option");
+    
+    // 生成年份選項（前後 10 年）
+    for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+      const option = document.createElement('option');
       option.value = year;
-      option.textContent = `${year}年`;
+      option.textContent = year + '年';
       yearSelect.appendChild(option);
     }
-
+    
     yearSelect.value = this.currentDate.getFullYear();
-
-    yearSelect.addEventListener("change", (e) => {
+    
+    yearSelect.addEventListener('change', (e) => {
       this.currentDate.setFullYear(parseInt(e.target.value));
       this.renderCalendar(
         this.currentDate.getFullYear(),
@@ -1109,34 +1112,17 @@ class LunarCalendar {
   }
 
   initMonthSelect() {
-    const monthSelect = document.querySelector(".month-select");
-
-    // 添加月份選項
-    const months = [
-      "1月",
-      "2月",
-      "3月",
-      "4月",
-      "5月",
-      "6月",
-      "7月",
-      "8月",
-      "9月",
-      "10月",
-      "11月",
-      "12月",
-    ];
-
-    months.forEach((month, index) => {
-      const option = document.createElement("option");
-      option.value = index;
-      option.textContent = month;
+    const monthSelect = document.querySelector('.month-select');
+    for (let i = 0; i < 12; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = (i + 1) + '月';
       monthSelect.appendChild(option);
-    });
-
+    }
+    
     monthSelect.value = this.currentDate.getMonth();
-
-    monthSelect.addEventListener("change", (e) => {
+    
+    monthSelect.addEventListener('change', (e) => {
       this.currentDate.setMonth(parseInt(e.target.value));
       this.renderCalendar(
         this.currentDate.getFullYear(),
@@ -1237,18 +1223,54 @@ class LunarCalendar {
   initTouchGestures() {
     const calendarBody = document.getElementById('calendar-body');
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
+    let isSwiping = false;
+    let startTime = 0;
+    let isHorizontalSwipe = null;  // 用於判斷滑動方向
     
     calendarBody.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      startTime = Date.now();
+      isSwiping = true;
+      isHorizontalSwipe = null;  // 重置滑動方向
     }, { passive: true });
     
+    calendarBody.addEventListener('touchmove', (e) => {
+      if (!isSwiping) return;
+      
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = currentX - touchStartX;
+      const diffY = currentY - touchStartY;
+      
+      // 第一次判斷滑動方向
+      if (isHorizontalSwipe === null) {
+        // 如果水平移動大於垂直移動，且水平移動超過 10px
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+          isHorizontalSwipe = true;
+          e.preventDefault();
+        } else if (Math.abs(diffY) > 10) {
+          // 如果垂直移動超過 10px，標記為垂直滑動
+          isHorizontalSwipe = false;
+        }
+      } else if (isHorizontalSwipe) {
+        // 如果已確定是水平滑動，阻止垂直滾動
+        e.preventDefault();
+      }
+    }, { passive: false });
+    
     calendarBody.addEventListener('touchend', (e) => {
+      if (!isSwiping || !isHorizontalSwipe) return;  // 只處理水平滑動
+      isSwiping = false;
+      
       touchEndX = e.changedTouches[0].clientX;
       const diffX = touchEndX - touchStartX;
+      const timeDiff = Date.now() - startTime;
       
-      // 如果滑動距離超過50px，則切換月份
-      if (Math.abs(diffX) > 50) {
+      // 判斷是否為有效的滑動手勢
+      if (Math.abs(diffX) > 50 || (Math.abs(diffX) > 30 && timeDiff < 300)) {
         if (diffX > 0) {
           // 向右滑動，上個月
           const date = this.currentDate;
@@ -1262,6 +1284,13 @@ class LunarCalendar {
         }
       }
     }, { passive: true });
+    
+    // 防止 iOS 的橡皮筋效果影響滑動
+    document.body.addEventListener('touchmove', (e) => {
+      if (isSwiping && isHorizontalSwipe) {
+        e.preventDefault();
+      }
+    }, { passive: false });
   }
 
   initPullToRefresh() {
@@ -1309,6 +1338,36 @@ class LunarCalendar {
       setTimeout(() => {
         refreshHint.textContent = '下拉刷新';
       }, 300);
+    }, { passive: true });
+  }
+
+  initScrollBehavior() {
+    const calendarBody = document.getElementById('calendar-body');
+    const header = document.querySelector('.calendar-header');
+    let lastScrollTop = 0;
+    let scrollTimeout;
+
+    calendarBody.addEventListener('scroll', () => {
+      const scrollTop = calendarBody.scrollTop;
+      
+      // 清除之前的 timeout
+      clearTimeout(scrollTimeout);
+      
+      // 當向下滾動超過 20px 時收縮 header
+      if (scrollTop > 20) {
+        header.classList.add('compact');
+      } else {
+        header.classList.remove('compact');
+      }
+      
+      // 設置新的 timeout，在停止滾動 150ms 後展開 header
+      scrollTimeout = setTimeout(() => {
+        if (scrollTop < 20) {
+          header.classList.remove('compact');
+        }
+      }, 150);
+      
+      lastScrollTop = scrollTop;
     }, { passive: true });
   }
 }

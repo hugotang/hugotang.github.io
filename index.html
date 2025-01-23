@@ -48,6 +48,9 @@
             --prev-next-month-text: #999;
             --prev-next-month-lunar: #aaa;
             --prev-next-month-jianzhu: #89b9e9;
+
+            /* 定義主題顏色的 RGB 值 */
+            --header-rgb: 74, 144, 226;  /* 淺色主題的藍色 */
         }
 
         /* 深色模式樣式 */
@@ -91,6 +94,9 @@
                 --prev-next-month-text: #666;
                 --prev-next-month-lunar: #555;
                 --prev-next-month-jianzhu: #405d80;
+
+                /* 定義主題顏色的 RGB 值 */
+                --header-rgb: 26, 73, 119;  /* 深色主題的藍色 */
             }
 
             /* 深色模式特定調整 */
@@ -177,29 +183,26 @@
             top: 0;
             z-index: 100;
             background: var(--header-bg);
-            transition: all 0.3s ease;
-            padding: max(env(safe-area-inset-top), 8px) 12px 8px;
-            /* 為主題切換按鈕預留位置 */
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: max(env(safe-area-inset-top), 4px) 12px 4px;
             position: relative;
+            transform-origin: top;
         }
 
         .calendar-header h2 {
-            margin: 0 0 8px 0;
+            margin: 0 0 4px 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-
-        .solar-year {
-            font-size: 1.3em;
-            font-weight: 600;
+            gap: 4px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .lunar-year {
-            font-size: 0.8em;
+            font-size: 0.75em;
             background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 12px;
         }
 
@@ -219,25 +222,42 @@
 
         .year-select,
         .month-select {
-            appearance: none;
-            background: rgba(255, 255, 255, 0.15);
+            font-size: 1.2em;
+            font-weight: 600;
+            background: transparent;
             border: none;
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.9em;
             color: white;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: none !important;
+            white-space: nowrap;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            text-align: center;
+            text-align-last: center;
+            -moz-text-align-last: center;
+        }
+
+        /* 防止選中時的背景色變化 */
+        .year-select:focus,
+        .month-select:focus,
+        .year-select:active,
+        .month-select:active,
+        .year-select:hover,
+        .month-select:hover {
+            background: transparent;
+            color: white;
+            outline: none;
         }
 
         .nav-buttons {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .mobile-nav,
@@ -245,20 +265,20 @@
         .theme-toggle {
             background: rgba(255, 255, 255, 0.15);
             border: none;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 10px;
             color: white;
-            font-size: 0.9em;
+            font-size: 0.85em;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
 
         .theme-toggle {
             position: absolute;
-            top: max(env(safe-area-inset-top), 8px);
+            top: max(env(safe-area-inset-top), 4px);
             right: 12px;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             padding: 0;
             display: flex;
             align-items: center;
@@ -280,8 +300,8 @@
         }
 
         .calendar-header.collapsed {
-            padding-top: max(env(safe-area-inset-top), 4px);
-            padding-bottom: 4px;
+            padding-top: max(env(safe-area-inset-top), 2px);
+            padding-bottom: 2px;
         }
 
         .calendar-header.collapsed h2 {
@@ -308,6 +328,8 @@
             left: 0;
             right: 0;
             font-size: 0.7em;
+            margin-top: 2px;
+            opacity: 0.8;
         }
 
         .calendar-grid {
@@ -804,20 +826,23 @@
 
         .year-select,
         .month-select {
-            padding: 8px;
-            border-radius: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            background: transparent;
             border: none;
-            font-size: 0.9em;
+            color: white;
+            padding: 0;
+            margin: 0;
             cursor: pointer;
-            background: var(--dropdown-bg);
-            color: var(--button-text);
-            min-width: 80px;
-            text-align: center;
+            -webkit-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a90e2' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            padding-right: 30px;
+            background-image: none !important;
+            white-space: nowrap;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            text-align: center;
+            text-align-last: center;
+            -moz-text-align-last: center;
         }
 
         .year-select:hover,
@@ -829,8 +854,8 @@
             font-size: 0.75em;   /* 調整農曆年份大小 */
             opacity: 0.9;
             background: rgba(255, 255, 255, 0.2);
-            padding: 3px 10px;   /* 減少內邊距 */
-            border-radius: 15px;
+            padding: 2px 6px;   /* 減少內邊距 */
+            border-radius: 12px;
         }
 
         @media (max-width: 768px) {
@@ -968,6 +993,9 @@
             --prev-next-month-text: #666;
             --prev-next-month-lunar: #555;
             --prev-next-month-jianzhu: #405d80;
+
+            /* 定義主題顏色的 RGB 值 */
+            --header-rgb: 26, 73, 119;
         }
 
         /* 強制淺色模式 */
@@ -1010,6 +1038,9 @@
             --prev-next-month-text: #999;
             --prev-next-month-lunar: #aaa;
             --prev-next-month-jianzhu: #89b9e9;
+
+            /* 定義主題顏色的 RGB 值 */
+            --header-rgb: 74, 144, 226;
         }
         
         .theme-toggle:hover {
@@ -1070,6 +1101,149 @@
             transform: scale(0.85);
             top: max(env(safe-area-inset-top), 4px);
         }
+
+        /* 調整選項樣式 */
+        .year-select option,
+        .month-select option {
+            color: var(--text-color);
+            background: var(--calendar-bg);
+            font-size: 0.9em;
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* 在選擇器之間添加分隔符 */
+        .month-select::before {
+            content: "";
+            margin: 0 2px;
+        }
+
+        /* 收縮狀態下的樣式調整 */
+        .calendar-header.collapsed h2 {
+            margin-bottom: 4px;
+        }
+
+        .calendar-header.collapsed .year-select,
+        .calendar-header.collapsed .month-select {
+            font-size: 1.1em;
+        }
+
+        /* 優化選擇器樣式 */
+        .year-select,
+        .month-select {
+            font-size: 1.3em;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: none !important;
+            white-space: nowrap;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            text-align: center;
+            text-align-last: center;
+            -moz-text-align-last: center;
+        }
+
+        /* iOS 特定樣式修復 */
+        @supports (-webkit-touch-callout: none) {
+            .year-select,
+            .month-select {
+                /* 移除 iOS 的默認背景和邊框 */
+                background: none !important;
+                border: none !important;
+                -webkit-appearance: none;
+                /* 修復文字顏色 */
+                color: white !important;
+                /* 修復選中時的背景 */
+                -webkit-background-clip: text;
+                /* 防止半透明效果 */
+                opacity: 1;
+            }
+
+            /* 修復 iOS 下拉選項的樣式 */
+            .year-select option,
+            .month-select option {
+                background-color: var(--calendar-bg);
+                color: var(--text-color);
+                font-size: 16px;  /* iOS 建議的最小字體大小 */
+                padding: 10px;
+            }
+        }
+
+        /* 確保選擇器在各平台上的一致性 */
+        .year-select,
+        .month-select,
+        .year-select:focus,
+        .month-select:focus,
+        .year-select:active,
+        .month-select:active {
+            background: transparent !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            color: white !important;
+        }
+
+        /* 滾動時的 header 樣式 */
+        .calendar-header.compact {
+            background: rgba(var(--header-rgb), 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding-top: max(env(safe-area-inset-top), 2px);
+            padding-bottom: 2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-header.compact h2 {
+            position: absolute;
+            opacity: 0;
+            transform: translateY(-100%);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                       opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .calendar-header.compact .calendar-controls {
+            margin: 0;
+            transform: none;
+        }
+
+        .calendar-header.compact .nav-buttons {
+            transform: scale(1);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 auto;
+        }
+
+        .calendar-header.compact .theme-toggle {
+            transform: scale(0.9);
+            opacity: 0.8;
+        }
+
+        .calendar-header.compact::after {
+            opacity: 0;
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 優化過渡效果 */
+        .calendar-header {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .calendar-header * {
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                       opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
 <body>
@@ -1077,14 +1251,11 @@
         <div class="calendar-header">
             <button class="theme-toggle">🌓</button>
             <h2>
-                <span class="solar-year"></span>
+                <select class="year-select"></select>
+                <select class="month-select"></select>
                 <span class="lunar-year"></span>
             </h2>
             <div class="calendar-controls">
-                <div class="date-selectors">
-                    <select class="year-select"></select>
-                    <select class="month-select"></select>
-                </div>
                 <div class="nav-buttons">
                     <button class="prev-month mobile-nav">◀</button>
                     <button class="next-month mobile-nav">▶</button>
